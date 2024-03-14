@@ -19,17 +19,17 @@ import org.hibernate.models.spi.TypeVariableReferenceDetails;
 import org.hibernate.models.spi.WildcardTypeDetails;
 
 /**
- * Used to determine the type details for a Map key - see {@linkplain #extractMapKeyType(TypeDetails)}
+ * Used to determine the type details for a Map key - see {@linkplain #extractMapKeyType(TypeDetails, ClassDetails)}
  *
  * @author Steve Ebersole
  */
 public class MapKeySwitch extends TypeDetailsSwitchSupport<TypeDetails> {
 
-	public static TypeDetails extractMapKeyType(TypeDetails memberType) {
+	public static TypeDetails extractMapKeyType(TypeDetails memberType, ClassDetails declaringType) {
 		assert memberType.isImplementor( Map.class );
 
 		final ClassDetails rawClassDetails = memberType.determineRawClass();
-		final MapKeySwitch mapKeySwitch = new MapKeySwitch( memberType );
+		final MapKeySwitch mapKeySwitch = new MapKeySwitch( memberType, declaringType );
 
 		// first, check super-type...
 		if ( rawClassDetails.getGenericSuperType() != null ) {
@@ -52,9 +52,11 @@ public class MapKeySwitch extends TypeDetailsSwitchSupport<TypeDetails> {
 	}
 
 	private final TypeDetails memberTypeDetails;
+	private final ClassDetails declaringType;
 
-	private MapKeySwitch(TypeDetails memberTypeDetails) {
+	private MapKeySwitch(TypeDetails memberTypeDetails, ClassDetails declaringType) {
 		this.memberTypeDetails = memberTypeDetails;
+		this.declaringType = declaringType;
 	}
 
 	@Override
@@ -86,7 +88,7 @@ public class MapKeySwitch extends TypeDetailsSwitchSupport<TypeDetails> {
 	@Override
 	public TypeDetails caseTypeVariable(TypeVariableDetails typeVariable) {
 		if ( typeVariable.isImplementor( Map.class ) ) {
-			return memberTypeDetails.resolveTypeVariable( typeVariable.getIdentifier() );
+			return memberTypeDetails.resolveTypeVariable( typeVariable.getIdentifier(), declaringType );
 		}
 		return null;
 	}
@@ -94,7 +96,7 @@ public class MapKeySwitch extends TypeDetailsSwitchSupport<TypeDetails> {
 	@Override
 	public TypeDetails caseTypeVariableReference(TypeVariableReferenceDetails typeVariableReference) {
 		if ( typeVariableReference.isImplementor( Map.class ) ) {
-			return memberTypeDetails.resolveTypeVariable( typeVariableReference.getIdentifier() );
+			return memberTypeDetails.resolveTypeVariable( typeVariableReference.getIdentifier(), declaringType );
 		}
 		return null;
 	}

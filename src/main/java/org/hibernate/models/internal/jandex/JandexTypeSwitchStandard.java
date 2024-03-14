@@ -36,7 +36,6 @@ import org.jboss.jandex.TypeVariableReference;
 import org.jboss.jandex.VoidType;
 import org.jboss.jandex.WildcardType;
 
-import static org.hibernate.models.internal.jandex.JandexTypeSwitcher.switchType;
 import static org.hibernate.models.internal.util.CollectionHelper.arrayList;
 
 /**
@@ -45,7 +44,21 @@ import static org.hibernate.models.internal.util.CollectionHelper.arrayList;
  * @author Steve Ebersole
  */
 public class JandexTypeSwitchStandard implements JandexTypeSwitch<TypeDetails> {
-	public static final JandexTypeSwitchStandard TYPE_SWITCH_STANDARD = new JandexTypeSwitchStandard();
+	public static TypeDetails switchType(Type type, SourceModelBuildingContext buildingContext) {
+		assert type.kind() != Type.Kind.TYPE_VARIABLE;
+		return switchType( type, null, buildingContext );
+	}
+
+	public static TypeDetails switchType(Type type, ClassDetails declaringType, SourceModelBuildingContext buildingContext) {
+		final JandexTypeSwitchStandard genericVariableSwitch = new JandexTypeSwitchStandard( declaringType );
+		return JandexTypeSwitcher.switchType( type, genericVariableSwitch, buildingContext );
+	}
+
+	private final ClassDetails declaringType;
+
+	public JandexTypeSwitchStandard(ClassDetails declaringType) {
+		this.declaringType = declaringType;
+	}
 
 	@Override
 	public TypeDetails caseClass(ClassType classType, SourceModelBuildingContext buildingContext) {
@@ -91,7 +104,7 @@ public class JandexTypeSwitchStandard implements JandexTypeSwitch<TypeDetails> {
 		try {
 			final Type bound = (Type) BOUND_METHOD.invoke( wildcardType );
 			final boolean isExtends = (boolean) IS_EXTENDS_METHOD.invoke( wildcardType );
-			return new WildcardTypeDetailsImpl( switchType( bound, TYPE_SWITCH_STANDARD, buildingContext ), isExtends );
+			return new WildcardTypeDetailsImpl( JandexTypeSwitcher.switchType( bound, this, buildingContext ), isExtends );
 		}
 		catch (IllegalAccessException | InvocationTargetException e) {
 			throw new RuntimeException( e );
@@ -102,6 +115,7 @@ public class JandexTypeSwitchStandard implements JandexTypeSwitch<TypeDetails> {
 	public TypeDetails caseTypeVariable(TypeVariable typeVariable, SourceModelBuildingContext buildingContext) {
 		return new TypeVariableDetailsImpl(
 				typeVariable.identifier(),
+				declaringType,
 				resolveTypes( typeVariable.bounds(), this, buildingContext )
 		);
 	}
@@ -115,7 +129,7 @@ public class JandexTypeSwitchStandard implements JandexTypeSwitch<TypeDetails> {
 
 	@Override
 	public TypeDetails caseArrayType(ArrayType arrayType, SourceModelBuildingContext buildingContext) {
-		final TypeDetails componentTypeDetails = switchType( arrayType.componentType(), this, buildingContext );
+		final TypeDetails componentTypeDetails = JandexTypeSwitcher.switchType( arrayType.componentType(), this, buildingContext );
 		return TypeDetailsHelper.arrayOf( componentTypeDetails, buildingContext );
 	}
 
@@ -135,7 +149,7 @@ public class JandexTypeSwitchStandard implements JandexTypeSwitch<TypeDetails> {
 
 		final ArrayList<TypeDetails> result = arrayList( typeArguments.size() );
 		for ( Type typeArgument : typeArguments ) {
-			final TypeDetails switchedType = switchType( typeArgument, typeSwitch, buildingContext );
+			final TypeDetails switchedType = JandexTypeSwitcher.switchType( typeArgument, typeSwitch, buildingContext );
 			result.add( switchedType );
 		}
 		return result;
@@ -151,7 +165,7 @@ public class JandexTypeSwitchStandard implements JandexTypeSwitch<TypeDetails> {
 
 		final ArrayList<TypeDetails> result = arrayList( types.size() );
 		for ( Type actualTypeArgument : types ) {
-			final TypeDetails switchedType = switchType( actualTypeArgument, typeSwitch, buildingContext );
+			final TypeDetails switchedType = JandexTypeSwitcher.switchType( actualTypeArgument, typeSwitch, buildingContext );
 			result.add( switchedType );
 		}
 		return result;

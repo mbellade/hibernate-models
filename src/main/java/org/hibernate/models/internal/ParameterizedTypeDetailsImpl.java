@@ -45,7 +45,7 @@ public class ParameterizedTypeDetailsImpl implements ParameterizedTypeDetails {
 	}
 
 	@Override
-	public TypeDetails resolveTypeVariable(String identifier) {
+	public TypeDetails resolveTypeVariable(String identifier, ClassDetails declaringType) {
 		final List<TypeVariableDetails> typeParameters = genericClassDetails.getTypeParameters();
 		assert typeParameters.size() == arguments.size();
 

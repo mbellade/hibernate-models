@@ -19,17 +19,16 @@ import org.hibernate.models.spi.TypeVariableReferenceDetails;
 import org.hibernate.models.spi.WildcardTypeDetails;
 
 /**
- * Used to determine the type details for a Collection element - see {@linkplain #extractCollectionElementType(TypeDetails)}
+ * Used to determine the type details for a Collection element - see {@linkplain #extractCollectionElementType(TypeDetails, ClassDetails)}
  *
  * @author Steve Ebersole
  */
 public class CollectionElementSwitch extends TypeDetailsSwitchSupport<TypeDetails> {
-
-	public static TypeDetails extractCollectionElementType(TypeDetails memberType) {
+	public static TypeDetails extractCollectionElementType(TypeDetails memberType, ClassDetails declaringType) {
 		assert memberType.isImplementor( Collection.class );
 
 		final ClassDetails rawClassDetails = memberType.determineRawClass();
-		final CollectionElementSwitch collectionElementSwitch = new CollectionElementSwitch( memberType );
+		final CollectionElementSwitch collectionElementSwitch = new CollectionElementSwitch( memberType, declaringType );
 
 		// first, check super-type...
 		if ( rawClassDetails.getGenericSuperType() != null ) {
@@ -52,9 +51,11 @@ public class CollectionElementSwitch extends TypeDetailsSwitchSupport<TypeDetail
 	}
 
 	private final TypeDetails memberTypeDetails;
+	private final ClassDetails declaringType;
 
-	private CollectionElementSwitch(TypeDetails memberTypeDetails) {
+	private CollectionElementSwitch(TypeDetails memberTypeDetails, ClassDetails declaringType) {
 		this.memberTypeDetails = memberTypeDetails;
+		this.declaringType = declaringType;
 	}
 
 	@Override
@@ -86,7 +87,7 @@ public class CollectionElementSwitch extends TypeDetailsSwitchSupport<TypeDetail
 	@Override
 	public TypeDetails caseTypeVariable(TypeVariableDetails typeVariable) {
 		if ( typeVariable.isImplementor( Collection.class ) ) {
-			return memberTypeDetails.resolveTypeVariable( typeVariable.getIdentifier() );
+			return memberTypeDetails.resolveTypeVariable( typeVariable.getIdentifier(), declaringType );
 		}
 		return null;
 	}
@@ -94,7 +95,7 @@ public class CollectionElementSwitch extends TypeDetailsSwitchSupport<TypeDetail
 	@Override
 	public TypeDetails caseTypeVariableReference(TypeVariableReferenceDetails typeVariableReference) {
 		if ( typeVariableReference.isImplementor( Collection.class ) ) {
-			return memberTypeDetails.resolveTypeVariable( typeVariableReference.getIdentifier() );
+			return memberTypeDetails.resolveTypeVariable( typeVariableReference.getIdentifier(), declaringType );
 		}
 		return null;
 	}

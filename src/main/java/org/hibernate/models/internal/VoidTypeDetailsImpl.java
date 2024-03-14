@@ -41,7 +41,7 @@ public class VoidTypeDetailsImpl implements VoidTypeDetails {
 	}
 
 	@Override
-	public TypeDetails resolveTypeVariable(String identifier) {
+	public TypeDetails resolveTypeVariable(String identifier, ClassDetails declaringType) {
 		return this;
 	}
 

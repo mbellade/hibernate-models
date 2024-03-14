@@ -70,7 +70,7 @@ public interface MemberDetails extends AnnotationTarget {
 		if ( memberType.isImplementor( Collection.class ) ) {
 			if ( memberType.getTypeKind() == TypeDetails.Kind.CLASS ) {
 				// handle "concrete types" such as `class SpecialList implements List<String>`
-				return CollectionElementSwitch.extractCollectionElementType( memberType );
+				return CollectionElementSwitch.extractCollectionElementType( memberType, getDeclaringType() );
 			}
 			if ( memberType.getTypeKind() == TypeDetails.Kind.PARAMETERIZED_TYPE ) {
 				final ParameterizedTypeDetails parameterizedType = memberType.asParameterizedType();
@@ -87,7 +87,7 @@ public interface MemberDetails extends AnnotationTarget {
 		if ( memberType.isImplementor( Map.class ) ) {
 			if ( memberType.getTypeKind() == TypeDetails.Kind.CLASS ) {
 				// handle "concrete types" such as `class SpecialMap implements Map<String,String>`
-				return MapValueSwitch.extractMapValueType( memberType );
+				return MapValueSwitch.extractMapValueType( memberType, getDeclaringType() );
 			}
 			if ( memberType.getTypeKind() == TypeDetails.Kind.PARAMETERIZED_TYPE ) {
 				final ParameterizedTypeDetails parameterizedType = memberType.asParameterizedType();
@@ -117,7 +117,7 @@ public interface MemberDetails extends AnnotationTarget {
 		if ( memberType.isImplementor( Map.class ) ) {
 			if ( memberType.getTypeKind() == TypeDetails.Kind.CLASS ) {
 				// handle "concrete types" such as `class SpecialMap implements Map<String,String>`
-				return MapKeySwitch.extractMapKeyType( memberType );
+				return MapKeySwitch.extractMapKeyType( memberType, getDeclaringType() );
 			}
 			if ( memberType.getTypeKind() == TypeDetails.Kind.PARAMETERIZED_TYPE ) {
 				final ParameterizedTypeDetails parameterizedType = memberType.asParameterizedType();
@@ -238,7 +238,18 @@ public interface MemberDetails extends AnnotationTarget {
 	 * getters, setters and record components.
 	 */
 	default TypeDetails resolveRelativeType(TypeVariableScope container) {
-		return getType().determineRelativeType( container );
+		return getType().determineRelativeType( container, getDeclaringType() );
+	}
+
+	/**
+	 * Same as {@link #resolveRelativeType(TypeVariableScope)} but for the
+	 * {@linkplain #getAssociatedType() associated type}.
+	 *
+	 * @see #getAssociatedType()
+	 * @see #resolveRelativeType(TypeVariableScope)
+	 */
+	default TypeDetails resolveRelativeAssociatedType(TypeVariableScope container) {
+		return getAssociatedType().determineRelativeType( container, getDeclaringType() );
 	}
 
 	/**
@@ -248,7 +259,7 @@ public interface MemberDetails extends AnnotationTarget {
 	 * into the concrete class.
 	 */
 	default ClassBasedTypeDetails resolveRelativeClassType(TypeVariableScope container) {
-		return TypeDetailsHelper.resolveRelativeClassType( getType(), container );
+		return TypeDetailsHelper.resolveRelativeClassType( getType(), container, getDeclaringType() );
 	}
 
 	enum Visibility {

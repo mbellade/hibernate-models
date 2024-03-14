@@ -15,6 +15,8 @@ import java.util.List;
  * The {@linkplain #getName() name} of the type variable corresponds to the raw type name,
  * which is the first upper bound. The {@linkplain #getIdentifier() identifier}  is the name
  * of the type variable as present in the source code.
+ * For class-level type variables, {@linkplain #getDeclaringType() declaring type} corresponds
+ * to the class that defined this type variable.
  * <p/>
  * For example:
  * <pre class="brush:java">
@@ -30,7 +32,11 @@ import java.util.List;
 public interface TypeVariableDetails extends TypeDetails {
 	String getIdentifier();
 
+	ClassDetails getDeclaringType();
+
 	List<TypeDetails> getBounds();
+
+	boolean matches(String identifier, ClassDetails declaringType);
 
 	@Override
 	default Kind getTypeKind() {

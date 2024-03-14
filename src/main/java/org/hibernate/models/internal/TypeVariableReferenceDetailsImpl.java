@@ -7,6 +7,7 @@
 
 package org.hibernate.models.internal;
 
+import org.hibernate.models.spi.ClassDetails;
 import org.hibernate.models.spi.TypeDetails;
 import org.hibernate.models.spi.TypeVariableDetails;
 import org.hibernate.models.spi.TypeVariableReferenceDetails;
@@ -61,7 +62,7 @@ public class TypeVariableReferenceDetailsImpl implements TypeVariableReferenceDe
 	}
 
 	@Override
-	public TypeDetails resolveTypeVariable(String identifier) {
+	public TypeDetails resolveTypeVariable(String identifier, ClassDetails declaringType) {
 		return this.identifier.equals( identifier ) ? target : null;
 	}
 }

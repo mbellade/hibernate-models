@@ -62,7 +62,7 @@ public class SimpleTypeVariableTests {
 		assertThat( idFieldType.isImplementor( String.class ) ).isFalse();
 		// resolved because we know it is a Number
 		assertThat( idFieldType.isResolved() ).isTrue();
-		assertThat( idFieldType.determineRelativeType( classDetails ).isResolved() ).isTrue();
+		assertThat( idFieldType.determineRelativeType( classDetails, idField.getDeclaringType() ).isResolved() ).isTrue();
 
 		final TypeDetails idFieldConcreteType = idField.resolveRelativeType( classDetails );
 		assertThat( idFieldConcreteType ).isInstanceOf( TypeVariableDetails.class );

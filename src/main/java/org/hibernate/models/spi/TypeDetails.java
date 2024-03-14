@@ -122,8 +122,8 @@ public interface TypeDetails extends TypeVariableScope {
 	 *     <li>Passing {@code AnotherThing}, the result would be {@code ClassTypeDetails(Integer)}</li>
 	 * </ul>
 	 */
-	default TypeDetails determineRelativeType(TypeVariableScope container) {
-		return TypeDetailsHelper.resolveRelativeType( this, container );
+	default TypeDetails determineRelativeType(TypeVariableScope container, ClassDetails declaringType) {
+		return TypeDetailsHelper.resolveRelativeType( this, container, declaringType );
 	}
 
 	@Override

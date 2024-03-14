@@ -29,7 +29,7 @@ public interface TypeVariableScope {
 	 *
 	 * @return The type variable, or {@code null} none could be found
 	 */
-	TypeDetails resolveTypeVariable(String identifier);
+	TypeDetails resolveTypeVariable(String identifier, ClassDetails declaringType);
 
 	/**
 	 * Determine the raw {@linkplain ClassDetails class} for the given type. Never returns {@code null}, opting

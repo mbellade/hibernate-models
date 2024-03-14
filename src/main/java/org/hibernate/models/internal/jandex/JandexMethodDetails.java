@@ -135,7 +135,7 @@ public class JandexMethodDetails extends AbstractAnnotationTarget implements Met
 	@Override
 	public TypeDetails resolveRelativeType(TypeVariableScope container) {
 		if ( methodKind == GETTER || methodKind == SETTER ) {
-			return type.determineRelativeType( container );
+			return type.determineRelativeType( container, declaringType );
 		}
 		throw new IllegalStateException( "Method does not have a type - " + this );
 	}
@@ -143,7 +143,7 @@ public class JandexMethodDetails extends AbstractAnnotationTarget implements Met
 	@Override
 	public ClassBasedTypeDetails resolveRelativeClassType(TypeVariableScope container) {
 		if ( methodKind == GETTER || methodKind == SETTER ) {
-			return TypeDetailsHelper.resolveRelativeClassType( type, container );
+			return TypeDetailsHelper.resolveRelativeClassType( type, container, declaringType );
 		}
 		throw new IllegalStateException( "Method does not have a type - " + this );
 	}

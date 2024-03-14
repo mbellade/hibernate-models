@@ -30,7 +30,7 @@ import org.jboss.jandex.TypeVariable;
 
 import static java.util.Collections.emptyList;
 import static org.hibernate.models.internal.ModelsClassLogging.MODELS_CLASS_LOGGER;
-import static org.hibernate.models.internal.jandex.JandexTypeSwitchStandard.TYPE_SWITCH_STANDARD;
+import static org.hibernate.models.internal.jandex.JandexTypeSwitchStandard.switchType;
 import static org.hibernate.models.internal.util.CollectionHelper.arrayList;
 import static org.hibernate.models.internal.util.CollectionHelper.isEmpty;
 
@@ -76,7 +76,7 @@ public class JandexClassDetails extends AbstractAnnotationTarget implements Clas
 			return null;
 		}
 
-		return JandexTypeSwitcher.switchType( classInfo.superClassType(), TYPE_SWITCH_STANDARD, buildingContext );
+		return switchType( classInfo.superClassType(), buildingContext );
 	}
 
 	private static List<TypeDetails> determineInterfaces(
@@ -89,9 +89,8 @@ public class JandexClassDetails extends AbstractAnnotationTarget implements Clas
 
 		final List<TypeDetails> result = arrayList( interfaceTypes.size() );
 		for ( Type interfaceType : interfaceTypes ) {
-			final TypeDetails switchedType = JandexTypeSwitcher.switchType(
+			final TypeDetails switchedType = switchType(
 					interfaceType,
-					TYPE_SWITCH_STANDARD,
 					buildingContext
 			);
 			result.add( switchedType );
@@ -107,7 +106,7 @@ public class JandexClassDetails extends AbstractAnnotationTarget implements Clas
 
 		final ArrayList<TypeVariableDetails> result = arrayList( jandexTypeVariables.size() );
 		for ( TypeVariable jandexTypeVariable : jandexTypeVariables ) {
-			result.add( (TypeVariableDetails) JandexTypeSwitcher.switchType( jandexTypeVariable, TYPE_SWITCH_STANDARD, buildingContext ) );
+			result.add( (TypeVariableDetails) switchType( jandexTypeVariable, this, buildingContext ) );
 		}
 		return result;
 	}

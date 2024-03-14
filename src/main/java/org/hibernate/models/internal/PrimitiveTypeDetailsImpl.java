@@ -31,7 +31,7 @@ public record PrimitiveTypeDetailsImpl(ClassDetails classDetails) implements Pri
 	}
 
 	@Override
-	public TypeDetails resolveTypeVariable(String identifier) {
+	public TypeDetails resolveTypeVariable(String identifier, ClassDetails declaringType) {
 		return this;
 	}
 

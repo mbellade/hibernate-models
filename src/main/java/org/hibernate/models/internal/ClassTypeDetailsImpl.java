@@ -42,8 +42,8 @@ public class ClassTypeDetailsImpl implements ClassTypeDetails {
 	}
 
 	@Override
-	public TypeDetails resolveTypeVariable(String identifier) {
-		return getClassDetails().resolveTypeVariable( identifier );
+	public TypeDetails resolveTypeVariable(String identifier, ClassDetails declaringType) {
+		return getClassDetails().resolveTypeVariable( identifier, declaringType );
 	}
 
 	@Override

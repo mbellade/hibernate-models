@@ -40,7 +40,10 @@ public class TypeDetailsHelper {
 	 * will return {@code ClassTypeDetails(Integer)}.  A call to resolve the type of {@code id}
 	 * relative to {@code Item} returns {@code ParameterizedTypeDetails(T)} (roughly Object)
 	 */
-	public static TypeDetails resolveRelativeType(TypeDetails type, TypeVariableScope container) {
+	public static TypeDetails resolveRelativeType(
+			TypeDetails type,
+			TypeVariableScope container,
+			ClassDetails declaringType) {
 		switch ( type.getTypeKind() ) {
 			case CLASS, PRIMITIVE, VOID, ARRAY -> {
 				return type;
@@ -54,7 +57,7 @@ public class TypeDetailsHelper {
 				else {
 					resolvedArguments = arrayList( parameterizedType.getArguments().size() );
 					for ( TypeDetails argument : parameterizedType.getArguments() ) {
-						resolvedArguments.add( argument.determineRelativeType( container ) );
+						resolvedArguments.add( argument.determineRelativeType( container, declaringType ) );
 					}
 				}
 				return new ParameterizedTypeDetailsImpl(
@@ -65,7 +68,7 @@ public class TypeDetailsHelper {
 			}
 			case TYPE_VARIABLE -> {
 				final TypeVariableDetails typeVariable = type.asTypeVariable();
-				return container.resolveTypeVariable( typeVariable.getIdentifier() );
+				return container.resolveTypeVariable( typeVariable.getIdentifier(), declaringType );
 			}
 			case TYPE_VARIABLE_REFERENCE -> {
 				throw new UnsupportedOperationException( "TypeVariableReferenceDetails not supported for concrete type resolution" );
@@ -110,18 +113,21 @@ public class TypeDetailsHelper {
 	}
 
 	/**
-	 * Very much the same as {@linkplain #resolveRelativeType(TypeDetails, TypeVariableScope)}, except that
+	 * Very much the same as {@linkplain #resolveRelativeType(TypeDetails, TypeVariableScope, ClassDetails)}, except that
 	 * here we resolve the relative type to the corresponding {@link ClassBasedTypeDetails} which
 	 * gives easy access to the type's {@linkplain ClassBasedTypeDetails#getClassDetails() ClassDetails}
 	 */
-	public static ClassBasedTypeDetails resolveRelativeClassType(TypeDetails memberType, TypeVariableScope containerType) {
+	public static ClassBasedTypeDetails resolveRelativeClassType(
+			TypeDetails memberType,
+			TypeVariableScope containerType,
+			ClassDetails declaringType) {
 		switch ( memberType.getTypeKind() ) {
 			case CLASS, PRIMITIVE, VOID, ARRAY -> {
 				return (ClassBasedTypeDetails) memberType;
 			}
 			case TYPE_VARIABLE -> {
 				final TypeVariableDetails typeVariable = memberType.asTypeVariable();
-				final TypeDetails typeDetails = containerType.resolveTypeVariable( typeVariable.getIdentifier() );
+				final TypeDetails typeDetails = containerType.resolveTypeVariable( typeVariable.getIdentifier(), declaringType );
 				if ( typeDetails.getTypeKind() == TypeDetails.Kind.CLASS ) {
 					return typeDetails.asClassType();
 				}
@@ -147,7 +153,7 @@ public class TypeDetailsHelper {
 				throw new UnsupportedOperationException( "TypeVariableReferenceDetails not supported for relative class resolution" );
 			}
 			case PARAMETERIZED_TYPE, WILDCARD_TYPE -> {
-				return resolveRelativeType( memberType, containerType ).asClassType();
+				return resolveRelativeType( memberType, containerType, declaringType ).asClassType();
 			}
 			default -> {
 				throw new UnsupportedOperationException( "Unknown TypeDetails kind - " + memberType.getTypeKind() );
@@ -185,7 +191,7 @@ public class TypeDetailsHelper {
 			}
 			case TYPE_VARIABLE_REFERENCE -> {
 				final String identifier = typeDetails.asTypeVariableReference().getIdentifier();
-				final TypeDetails identifiedTypeDetails = typeDetails.resolveTypeVariable( identifier );
+				final TypeDetails identifiedTypeDetails = typeDetails.resolveTypeVariable( identifier, null );
 				return identifiedTypeDetails.determineRawClass();
 			}
 		}

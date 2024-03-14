@@ -84,9 +84,9 @@ public class ArrayTypeDetailsImpl implements ArrayTypeDetails {
 	}
 
 	@Override
-	public TypeDetails resolveTypeVariable(String identifier) {
+	public TypeDetails resolveTypeVariable(String identifier, ClassDetails declaringType) {
 		if ( constituentType.getTypeKind() == Kind.PARAMETERIZED_TYPE ) {
-			return constituentType.asParameterizedType().resolveTypeVariable( identifier );
+			return constituentType.asParameterizedType().resolveTypeVariable( identifier, declaringType );
 		}
 		return null;
 	}

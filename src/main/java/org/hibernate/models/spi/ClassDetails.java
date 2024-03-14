@@ -123,34 +123,37 @@ public interface ClassDetails extends AnnotationTarget, TypeVariableScope {
 	}
 
 	@Override
-	default TypeDetails resolveTypeVariable(String identifier) {
-		final TypeVariableDetails local = TypeDetailsHelper.findTypeVariableDetails(
-				identifier,
-				getTypeParameters()
-		);
-		if ( local != null && local.isResolved() ) {
-			return local;
+	default TypeDetails resolveTypeVariable(String identifier, ClassDetails declaringType) {
+		if ( this == declaringType ) {
+			return TypeDetailsHelper.findTypeVariableDetails(
+					identifier,
+					getTypeParameters()
+			);
 		}
 
-		if ( getGenericSuperType() != null ) {
-			if ( getGenericSuperType().getTypeKind() == TypeDetails.Kind.CLASS ) {
-				final TypeVariableDetails genericSuperVar = TypeDetailsHelper.findTypeVariableDetails(
-						identifier,
-						getGenericSuperType().asClassType().getClassDetails().getTypeParameters()
-				);
-				if ( genericSuperVar != null ) {
-					return genericSuperVar;
+		final TypeDetails genericSuperType = getGenericSuperType();
+		if ( genericSuperType != null ) {
+			if ( genericSuperType.getTypeKind() == TypeDetails.Kind.CLASS ) {
+				if ( genericSuperType.asClassType().getClassDetails() == declaringType ) {
+					final TypeVariableDetails genericSuperVar = TypeDetailsHelper.findTypeVariableDetails(
+							identifier,
+							genericSuperType.asClassType().getClassDetails().getTypeParameters()
+					);
+					if ( genericSuperVar != null ) {
+						return genericSuperVar;
+					}
 				}
 			}
 			else {
+				final ParameterizedTypeDetails parameterizedSuperType = genericSuperType.asParameterizedType();
 				// assume parameterized
 				final List<TypeVariableDetails> typeParameters = getSuperClass().getTypeParameters();
-				final List<TypeDetails> typeArguments = getGenericSuperType().asParameterizedType().getArguments();
+				final List<TypeDetails> typeArguments = parameterizedSuperType.getArguments();
 				assert typeParameters.size() == typeArguments.size();
 
 				for ( int i = 0; i < typeParameters.size(); i++ ) {
 					final TypeVariableDetails typeVariableDetails = typeParameters.get( i );
-					if ( typeVariableDetails.getIdentifier().equals( identifier ) ) {
+					if ( typeVariableDetails.matches( identifier, declaringType ) ) {
 						// we found the parameter, use the matching argument
 						return typeArguments.get( i );
 					}
@@ -166,13 +169,10 @@ public interface ClassDetails extends AnnotationTarget, TypeVariableScope {
 		}
 
 		if ( getSuperClass() != null ) {
-			final TypeDetails typeDetails = getSuperClass().resolveTypeVariable( identifier );
-			if ( typeDetails != ClassBasedTypeDetails.OBJECT_TYPE_DETAILS ) {
-				return typeDetails;
-			}
+			return getSuperClass().resolveTypeVariable( identifier, declaringType );
 		}
 
-		return local != null ? local : ClassBasedTypeDetails.OBJECT_TYPE_DETAILS;
+		return ClassBasedTypeDetails.OBJECT_TYPE_DETAILS;
 	}
 
 	@Override
