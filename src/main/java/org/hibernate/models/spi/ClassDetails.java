@@ -154,7 +154,7 @@ public interface ClassDetails extends AnnotationTarget, TypeVariableScope {
 		}
 
 		if ( found != null ) {
-			final TypeDetails typeDetails = superClass.resolveTypeVariable(
+			final TypeDetails typeDetails = superClass.resolveTypeVariable2(
 					typeVariable,
 					null
 			);
@@ -172,13 +172,18 @@ public interface ClassDetails extends AnnotationTarget, TypeVariableScope {
 
 	@Override
 	default TypeDetails resolveTypeVariable(TypeVariableDetails typeVariable, ClassDetails declaringType) {
-		assert declaringType == null || declaringType == typeVariable.getDeclaringType();
+		return resolveTypeVariable2( typeVariable, typeVariable.getDeclaringType() );
+	}
+
+	default TypeDetails resolveTypeVariable2(TypeVariableDetails typeVariable, ClassDetails declaringType) {
 		if ( this == declaringType ) {
 			return TypeDetailsHelper.findTypeVariableDetails(
 					typeVariable.getIdentifier(),
 					getTypeParameters()
 			);
 		}
+
+		declaringType = null;
 
 //		if ( foundLocal) {
 //			if ( getSuperClass() != null && getSuperClass() != typeVariable.getDeclaringType() ) {
