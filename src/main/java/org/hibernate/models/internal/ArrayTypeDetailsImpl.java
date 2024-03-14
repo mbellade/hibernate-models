@@ -13,6 +13,7 @@ import org.hibernate.models.internal.util.StringHelper;
 import org.hibernate.models.spi.ArrayTypeDetails;
 import org.hibernate.models.spi.ClassDetails;
 import org.hibernate.models.spi.TypeDetails;
+import org.hibernate.models.spi.TypeVariableDetails;
 
 /**
  * @author Steve Ebersole
@@ -84,9 +85,9 @@ public class ArrayTypeDetailsImpl implements ArrayTypeDetails {
 	}
 
 	@Override
-	public TypeDetails resolveTypeVariable(String identifier, ClassDetails declaringType) {
+	public TypeDetails resolveTypeVariable(TypeVariableDetails typeVariable, ClassDetails declaringType) {
 		if ( constituentType.getTypeKind() == Kind.PARAMETERIZED_TYPE ) {
-			return constituentType.asParameterizedType().resolveTypeVariable( identifier, declaringType );
+			return constituentType.asParameterizedType().resolveTypeVariable( typeVariable, declaringType );
 		}
 		return null;
 	}

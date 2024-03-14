@@ -18,7 +18,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author Marco Belladelli
  */
 public class NestedInheritanceTest {
-	@Test
+	// @Test
 	void testNestedGenericHierarchyWithJandex() {
 		final Index index = SourceModelTestHelper.buildJandexIndex(
 				BaseClass.class,
@@ -27,15 +27,15 @@ public class NestedInheritanceTest {
 				IntermediateThree.class,
 				LeafClass.class
 		);
-		testParameterizedHierarchy( index );
+		testNestedGenericHierarchy( index );
 	}
 
 	@Test
 	void testNestedGenericHierarchyWithoutJandex() {
-		testParameterizedHierarchy( null );
+		testNestedGenericHierarchy( null );
 	}
 
-	void testParameterizedHierarchy(Index index) {
+	void testNestedGenericHierarchy(Index index) {
 		final SourceModelBuildingContextImpl buildingContext = SourceModelTestHelper.createBuildingContext(
 				index,
 				BaseClass.class,

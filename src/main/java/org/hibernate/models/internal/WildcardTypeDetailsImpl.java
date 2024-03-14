@@ -10,6 +10,7 @@ package org.hibernate.models.internal;
 import org.hibernate.models.spi.ClassDetails;
 import org.hibernate.models.spi.ClassTypeDetails;
 import org.hibernate.models.spi.TypeDetails;
+import org.hibernate.models.spi.TypeVariableDetails;
 import org.hibernate.models.spi.WildcardTypeDetails;
 
 /**
@@ -75,7 +76,7 @@ public record WildcardTypeDetailsImpl(TypeDetails bound, boolean isExtends) impl
 	}
 
 	@Override
-	public TypeDetails resolveTypeVariable(String identifier, ClassDetails declaringType) {
+	public TypeDetails resolveTypeVariable(TypeVariableDetails typeVariable, ClassDetails declaringType) {
 		return null;
 	}
 }

@@ -87,7 +87,7 @@ public class CollectionElementSwitch extends TypeDetailsSwitchSupport<TypeDetail
 	@Override
 	public TypeDetails caseTypeVariable(TypeVariableDetails typeVariable) {
 		if ( typeVariable.isImplementor( Collection.class ) ) {
-			return memberTypeDetails.resolveTypeVariable( typeVariable.getIdentifier(), declaringType );
+			return memberTypeDetails.resolveTypeVariable( typeVariable, declaringType );
 		}
 		return null;
 	}
@@ -95,7 +95,7 @@ public class CollectionElementSwitch extends TypeDetailsSwitchSupport<TypeDetail
 	@Override
 	public TypeDetails caseTypeVariableReference(TypeVariableReferenceDetails typeVariableReference) {
 		if ( typeVariableReference.isImplementor( Collection.class ) ) {
-			return memberTypeDetails.resolveTypeVariable( typeVariableReference.getIdentifier(), declaringType );
+			return memberTypeDetails.resolveTypeVariable( typeVariableReference.getTarget(), declaringType );
 		}
 		return null;
 	}

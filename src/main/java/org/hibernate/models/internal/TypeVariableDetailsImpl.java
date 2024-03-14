@@ -33,8 +33,9 @@ public class TypeVariableDetailsImpl implements TypeVariableDetails {
 	}
 
 	@Override
-	public boolean matches(String identifier, ClassDetails declaringType) {
-		return this.identifier.equals( identifier ) && Objects.equals( this.declaringType, declaringType );
+	public boolean matches(TypeVariableDetails other) {
+		return this.identifier.equals( other.getIdentifier() )
+				&& Objects.equals( this.declaringType, other.getDeclaringType() );
 	}
 
 	private String calculateName(List<TypeDetails> bounds) {
@@ -70,8 +71,9 @@ public class TypeVariableDetailsImpl implements TypeVariableDetails {
 	}
 
 	@Override
-	public TypeDetails resolveTypeVariable(String identifier, ClassDetails declaringType) {
-		return this.identifier.equals( identifier ) ? this : null;
+	public TypeDetails resolveTypeVariable(TypeVariableDetails typeVariable, ClassDetails declaringType) {
+		// todo marco : this ok?
+		return this.matches( typeVariable ) ? this : null;
 	}
 
 	@Override

@@ -94,6 +94,7 @@ public class JandexTypeSwitchStandard implements JandexTypeSwitch<TypeDetails> {
 				.resolveClassDetails( parameterizedType.name().toString() );
 		return new ParameterizedTypeDetailsImpl(
 				classDetails,
+				classDetails.getTypeParameters(),
 				extractTypeParameters( parameterizedType, this, buildingContext ),
 				null
 		);

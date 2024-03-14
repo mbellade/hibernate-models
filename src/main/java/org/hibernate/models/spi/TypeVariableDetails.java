@@ -36,7 +36,7 @@ public interface TypeVariableDetails extends TypeDetails {
 
 	List<TypeDetails> getBounds();
 
-	boolean matches(String identifier, ClassDetails declaringType);
+	boolean matches(TypeVariableDetails typeVariable);
 
 	@Override
 	default Kind getTypeKind() {

@@ -73,6 +73,7 @@ public class JdkTrackingTypeSwitch implements JdkTypeSwitch<TypeDetails> {
 				.resolveClassDetails( parameterizedType.getRawType().getTypeName() );
 		return new ParameterizedTypeDetailsImpl(
 				classDetails,
+				classDetails.getTypeParameters(),
 				extractTypeParameters( parameterizedType ),
 				null
 		);

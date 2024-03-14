@@ -88,7 +88,7 @@ public class MapValueSwitch extends TypeDetailsSwitchSupport<TypeDetails> {
 	@Override
 	public TypeDetails caseTypeVariable(TypeVariableDetails typeVariable) {
 		if ( typeVariable.isImplementor( Map.class ) ) {
-			return memberTypeDetails.resolveTypeVariable( typeVariable.getIdentifier(), declaringType );
+			return memberTypeDetails.resolveTypeVariable( typeVariable, declaringType );
 		}
 		return null;
 	}
@@ -96,7 +96,7 @@ public class MapValueSwitch extends TypeDetailsSwitchSupport<TypeDetails> {
 	@Override
 	public TypeDetails caseTypeVariableReference(TypeVariableReferenceDetails typeVariableReference) {
 		if ( typeVariableReference.isImplementor( Map.class ) ) {
-			return memberTypeDetails.resolveTypeVariable( typeVariableReference.getIdentifier(), declaringType );
+			return memberTypeDetails.resolveTypeVariable( typeVariableReference.getTarget(), declaringType );
 		}
 		return null;
 	}

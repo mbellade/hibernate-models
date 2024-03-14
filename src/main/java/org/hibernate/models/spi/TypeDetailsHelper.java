@@ -62,13 +62,14 @@ public class TypeDetailsHelper {
 				}
 				return new ParameterizedTypeDetailsImpl(
 						parameterizedType.getRawClassDetails(),
+						parameterizedType.getRawClassDetails().getTypeParameters(),
 						resolvedArguments,
 						container
 				);
 			}
 			case TYPE_VARIABLE -> {
 				final TypeVariableDetails typeVariable = type.asTypeVariable();
-				return container.resolveTypeVariable( typeVariable.getIdentifier(), declaringType );
+				return container.resolveTypeVariable( typeVariable, declaringType );
 			}
 			case TYPE_VARIABLE_REFERENCE -> {
 				throw new UnsupportedOperationException( "TypeVariableReferenceDetails not supported for concrete type resolution" );
@@ -127,7 +128,7 @@ public class TypeDetailsHelper {
 			}
 			case TYPE_VARIABLE -> {
 				final TypeVariableDetails typeVariable = memberType.asTypeVariable();
-				final TypeDetails typeDetails = containerType.resolveTypeVariable( typeVariable.getIdentifier(), declaringType );
+				final TypeDetails typeDetails = containerType.resolveTypeVariable( typeVariable, declaringType );
 				if ( typeDetails.getTypeKind() == TypeDetails.Kind.CLASS ) {
 					return typeDetails.asClassType();
 				}
@@ -190,8 +191,8 @@ public class TypeDetailsHelper {
 				return ClassDetails.OBJECT_CLASS_DETAILS;
 			}
 			case TYPE_VARIABLE_REFERENCE -> {
-				final String identifier = typeDetails.asTypeVariableReference().getIdentifier();
-				final TypeDetails identifiedTypeDetails = typeDetails.resolveTypeVariable( identifier, null );
+				final TypeVariableReferenceDetails typeVariableReference = typeDetails.asTypeVariableReference();
+				final TypeDetails identifiedTypeDetails = typeDetails.resolveTypeVariable( typeVariableReference.getTarget(), null );
 				return identifiedTypeDetails.determineRawClass();
 			}
 		}

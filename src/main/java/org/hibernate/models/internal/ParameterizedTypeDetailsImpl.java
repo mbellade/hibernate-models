@@ -20,11 +20,17 @@ import org.hibernate.models.spi.TypeVariableScope;
  */
 public class ParameterizedTypeDetailsImpl implements ParameterizedTypeDetails {
 	private final ClassDetails genericClassDetails;
+	private final List<TypeVariableDetails> typeVariables;
 	private final List<TypeDetails> arguments;
-	private final TypeVariableScope owner;
+	private TypeVariableScope owner;
 
-	public ParameterizedTypeDetailsImpl(ClassDetails genericClassDetails, List<TypeDetails> arguments, TypeVariableScope owner) {
+	public ParameterizedTypeDetailsImpl(
+			ClassDetails genericClassDetails,
+			List<TypeVariableDetails> typeVariables,
+			List<TypeDetails> arguments,
+			TypeVariableScope owner) {
 		this.genericClassDetails = genericClassDetails;
+		this.typeVariables = typeVariables;
 		this.arguments = arguments;
 		this.owner = owner;
 	}
@@ -32,6 +38,10 @@ public class ParameterizedTypeDetailsImpl implements ParameterizedTypeDetails {
 	@Override
 	public ClassDetails getRawClassDetails() {
 		return genericClassDetails;
+	}
+
+	public List<TypeVariableDetails> getTypeVariables() {
+		return typeVariables;
 	}
 
 	@Override
@@ -45,12 +55,12 @@ public class ParameterizedTypeDetailsImpl implements ParameterizedTypeDetails {
 	}
 
 	@Override
-	public TypeDetails resolveTypeVariable(String identifier, ClassDetails declaringType) {
+	public TypeDetails resolveTypeVariable(TypeVariableDetails typeVariable, ClassDetails declaringType) {
 		final List<TypeVariableDetails> typeParameters = genericClassDetails.getTypeParameters();
 		assert typeParameters.size() == arguments.size();
 
 		for ( int i = 0; i < typeParameters.size(); i++ ) {
-			if ( typeParameters.get( i ).getIdentifier().equals( identifier ) ) {
+			if ( typeParameters.get( i ).getIdentifier().equals( typeVariable.getIdentifier() ) ) {
 				return arguments.get( i );
 			}
 		}

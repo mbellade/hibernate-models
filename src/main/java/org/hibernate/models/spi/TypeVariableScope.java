@@ -25,11 +25,11 @@ public interface TypeVariableScope {
 	 * A call to this method with {@code "I"} will return the {@code I extends Number}
 	 * type variable.
 	 *
-	 * @param identifier The type variable identifier
+	 * @param typeVariable The type variable
 	 *
 	 * @return The type variable, or {@code null} none could be found
 	 */
-	TypeDetails resolveTypeVariable(String identifier, ClassDetails declaringType);
+	TypeDetails resolveTypeVariable(TypeVariableDetails typeVariable, ClassDetails declaringType);
 
 	/**
 	 * Determine the raw {@linkplain ClassDetails class} for the given type. Never returns {@code null}, opting
