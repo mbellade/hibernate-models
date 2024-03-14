@@ -25,8 +25,6 @@ import java.util.List;
 public interface ParameterizedTypeDetails extends ClassBasedTypeDetails {
 	ClassDetails getRawClassDetails();
 
-	List<TypeVariableDetails> getTypeVariables();
-
 	List<TypeDetails> getArguments();
 
 	TypeVariableScope getOwner();

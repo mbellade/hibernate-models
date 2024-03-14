@@ -20,17 +20,14 @@ import org.hibernate.models.spi.TypeVariableScope;
  */
 public class ParameterizedTypeDetailsImpl implements ParameterizedTypeDetails {
 	private final ClassDetails genericClassDetails;
-	private final List<TypeVariableDetails> typeVariables;
 	private final List<TypeDetails> arguments;
 	private TypeVariableScope owner;
 
 	public ParameterizedTypeDetailsImpl(
 			ClassDetails genericClassDetails,
-			List<TypeVariableDetails> typeVariables,
 			List<TypeDetails> arguments,
 			TypeVariableScope owner) {
 		this.genericClassDetails = genericClassDetails;
-		this.typeVariables = typeVariables;
 		this.arguments = arguments;
 		this.owner = owner;
 	}
@@ -38,10 +35,6 @@ public class ParameterizedTypeDetailsImpl implements ParameterizedTypeDetails {
 	@Override
 	public ClassDetails getRawClassDetails() {
 		return genericClassDetails;
-	}
-
-	public List<TypeVariableDetails> getTypeVariables() {
-		return typeVariables;
 	}
 
 	@Override

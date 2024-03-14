@@ -62,7 +62,6 @@ public class TypeDetailsHelper {
 				}
 				return new ParameterizedTypeDetailsImpl(
 						parameterizedType.getRawClassDetails(),
-						parameterizedType.getRawClassDetails().getTypeParameters(),
 						resolvedArguments,
 						container
 				);
