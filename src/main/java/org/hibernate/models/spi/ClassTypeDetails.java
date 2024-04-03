@@ -22,4 +22,8 @@ public interface ClassTypeDetails extends ClassBasedTypeDetails {
 		return this;
 	}
 
+	@Override
+	default boolean isResolved() {
+		return true;
+	}
 }

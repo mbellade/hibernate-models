@@ -23,8 +23,6 @@ import org.hibernate.models.spi.TypeVariableReferenceDetails;
 import org.hibernate.models.spi.VoidTypeDetails;
 import org.hibernate.models.spi.WildcardTypeDetails;
 
-import static org.hibernate.models.internal.IsBoundTypeSwitch.IS_BOUND_SWITCH;
-
 /**
  * TypeDetailsSwitch implementation checking whether a type is resolved (all of its bounds are known)
  *
@@ -33,13 +31,14 @@ import static org.hibernate.models.internal.IsBoundTypeSwitch.IS_BOUND_SWITCH;
 public class IsResolvedTypeSwitch implements TypeDetailsSwitch<Boolean> {
 	public static final IsResolvedTypeSwitch IS_RESOLVED_SWITCH = new IsResolvedTypeSwitch();
 
-	private static boolean isBound(TypeDetails typeDetails, SourceModelBuildingContext buildingContext) {
-		return TypeDetailsSwitch.switchType( typeDetails, IS_BOUND_SWITCH, buildingContext );
+	public static boolean isBound(TypeDetails typeDetails, SourceModelBuildingContext buildingContext) {
+		return TypeDetailsSwitch.switchType( typeDetails, IS_RESOLVED_SWITCH, buildingContext );
 	}
 
 	@Override
 	public Boolean caseClass(ClassTypeDetails classType, SourceModelBuildingContext buildingContext) {
-		return true;
+		// not completely kosher, but works for our needs
+		return !Objects.equals( classType.getClassDetails(), ClassDetails.OBJECT_CLASS_DETAILS );
 	}
 
 	@Override
@@ -63,7 +62,7 @@ public class IsResolvedTypeSwitch implements TypeDetailsSwitch<Boolean> {
 			SourceModelBuildingContext buildingContext) {
 		final List<TypeDetails> typeArgs = parameterizedType.getArguments();
 		for ( TypeDetails arg : typeArgs ) {
-			if ( !isBound( arg, buildingContext ) ) {
+			if ( !arg.isResolved() ) {
 				return false;
 			}
 		}
@@ -72,8 +71,7 @@ public class IsResolvedTypeSwitch implements TypeDetailsSwitch<Boolean> {
 
 	@Override
 	public Boolean caseWildcardType(WildcardTypeDetails wildcardType, SourceModelBuildingContext buildingContext) {
-		final TypeDetails bound = wildcardType.getBound();
-		return bound != null && ( bound.getTypeKind() == TypeDetails.Kind.CLASS || isBound( bound, buildingContext ) );
+		return wildcardType.getBound().isResolved();
 	}
 
 	@Override

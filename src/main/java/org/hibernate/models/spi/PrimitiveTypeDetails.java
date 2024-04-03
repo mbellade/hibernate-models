@@ -29,4 +29,9 @@ public interface PrimitiveTypeDetails extends ClassBasedTypeDetails {
 
 	@Override
 	PrimitiveTypeDetails asPrimitiveType();
+
+	@Override
+	default boolean isResolved() {
+		return true;
+	}
 }

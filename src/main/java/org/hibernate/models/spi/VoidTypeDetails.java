@@ -15,4 +15,9 @@ package org.hibernate.models.spi;
 public interface VoidTypeDetails extends ClassBasedTypeDetails {
 	@Override
 	VoidTypeDetails asVoidType();
+
+	@Override
+	default boolean isResolved() {
+		return true;
+	}
 }
