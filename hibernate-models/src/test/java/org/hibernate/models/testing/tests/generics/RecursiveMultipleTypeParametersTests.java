@@ -18,13 +18,14 @@ public class RecursiveMultipleTypeParametersTests {
 	@Test
 	void testResolveRelativeTypeWithSelfReferenceFirst() {
 		final ModelsContext modelsContext = createModelContext( BaseEntityWithSelfReferenceFirst.class );
-
 		final ClassDetails classDetails = modelsContext.getClassDetailsRegistry().getClassDetails(
 				BaseEntityWithSelfReferenceFirst.class.getName()
 		);
+
 		final FieldDetails idField = classDetails.findFieldByName( "id" );
-		//Cannot resolve relative type here
-		idField.resolveRelativeType( classDetails );
+		final TypeDetails idType = idField.resolveRelativeType( classDetails );
+		assertThat( idType.getTypeKind() ).isEqualTo( TypeDetails.Kind.TYPE_VARIABLE );
+		assertThat( idType.isImplementor( Transitionable.class ) ).isTrue();
 	}
 
 	@Test
@@ -33,15 +34,11 @@ public class RecursiveMultipleTypeParametersTests {
 		final ClassDetails classDetails = modelsContext.getClassDetailsRegistry().getClassDetails(
 				BaseEntityWithSelfReferenceAfterType.class.getName()
 		);
-		final FieldDetails idField = classDetails.findFieldByName( "id" );
-		final TypeDetails idFieldType = idField.getType();
-		final FieldDetails statusFieldDetails = classDetails.findFieldByName( "id" );
-		//Same type different order of type parameters works
-		statusFieldDetails.resolveRelativeType( classDetails );
 
-		assertThat( idFieldType.getTypeKind() ).isEqualTo( TypeDetails.Kind.TYPE_VARIABLE );
-		assertThat( idFieldType.isImplementor( Object.class ) ).isTrue();
-		assertThat( idFieldType.isImplementor( Transitionable.class ) ).isTrue();
+		final FieldDetails idField = classDetails.findFieldByName( "id" );
+		final TypeDetails idType = idField.resolveRelativeType( classDetails );
+		assertThat( idType.getTypeKind() ).isEqualTo( TypeDetails.Kind.TYPE_VARIABLE );
+		assertThat( idType.isImplementor( Transitionable.class ) ).isTrue();
 	}
 
 	static class BaseEntityWithSelfReferenceFirst<S extends BaseEntityWithSelfReferenceFirst<S, I>, I extends Transitionable> {
