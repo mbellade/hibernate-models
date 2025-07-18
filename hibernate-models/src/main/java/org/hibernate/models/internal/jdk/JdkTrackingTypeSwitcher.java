@@ -15,7 +15,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.hibernate.models.internal.TypeVariableReferenceDetailsImpl;
-import org.hibernate.models.internal.util.CollectionHelper;
 import org.hibernate.models.spi.ModelsContext;
 import org.hibernate.models.spi.TypeDetails;
 import org.hibernate.models.spi.TypeVariableDetails;
@@ -26,7 +25,7 @@ import org.hibernate.models.spi.TypeVariableDetails;
 public class JdkTrackingTypeSwitcher implements JdkTypeSwitcher {
 	private final JdkTrackingTypeSwitch typeSwitch;
 
-	private List<String> typeVariableIdentifiers;
+	private Map<String, List<TypeVariableDetails>> typeVariables;
 	private Map<String, List<TypeVariableReferenceDetailsImpl>> typeVariableRefXref;
 
 	public static TypeDetails standardSwitchType(
@@ -67,36 +66,47 @@ public class JdkTrackingTypeSwitcher implements JdkTypeSwitcher {
 	}
 
 	private TypeDetails switchTypeVariable(Type type, @SuppressWarnings("rawtypes") TypeVariable typeVariable) {
-		if ( typeVariableIdentifiers == null ) {
-			typeVariableIdentifiers = new ArrayList<>();
+		if ( typeVariables == null ) {
+			typeVariables = new HashMap<>();
 		}
 		else {
-			if ( typeVariableIdentifiers.contains( typeVariable.getTypeName() ) ) {
+			if ( typeVariables.containsKey( typeVariable.getTypeName() ) ) {
+				final List<TypeVariableDetails> typeVariableDetails = typeVariables.get( typeVariable.getTypeName() );
+				if ( !typeVariableDetails.isEmpty() ) {
+					// The type variable has already been switched, so we can return the original details
+					assert typeVariableDetails.size() == 1;
+					return typeVariableDetails.get( 0 );
+				}
 				// this should indicate a "recursive" type var (e.g. `T extends Comparable<T>`)
 				final TypeVariableReferenceDetailsImpl reference = new TypeVariableReferenceDetailsImpl( type.getTypeName() );
 				if ( typeVariableRefXref == null ) {
 					typeVariableRefXref = new HashMap<>();
-					final List<TypeVariableReferenceDetailsImpl> list = typeVariableRefXref.computeIfAbsent(
-							type.getTypeName(),
-							(s) -> new ArrayList<>()
-					);
-					list.add( reference );
 				}
+				final List<TypeVariableReferenceDetailsImpl> list = typeVariableRefXref.computeIfAbsent(
+						type.getTypeName(),
+						(s) -> new ArrayList<>()
+				);
+				list.add( reference );
 				return reference;
 			}
 		}
-		typeVariableIdentifiers.add( typeVariable.getTypeName() );
+
+		final ArrayList<TypeVariableDetails> switchedDetails = new ArrayList<>( 1 );
+		typeVariables.put( typeVariable.getTypeName(), switchedDetails );
 
 		final TypeVariableDetails switched = typeSwitch.caseTypeVariable( typeVariable );
 		assert switched != null;
 
+		switchedDetails.add( switched );
+
 		if ( typeVariableRefXref != null ) {
 			final List<TypeVariableReferenceDetailsImpl> list = typeVariableRefXref.get( typeVariable.getTypeName() );
-			if ( CollectionHelper.isNotEmpty( list ) ) {
+			if ( list != null ) {
 				for ( TypeVariableReferenceDetailsImpl reference : list ) {
 					reference.setTarget( switched );
 				}
 			}
+			typeVariableRefXref.remove( typeVariable.getTypeName() );
 		}
 
 		return switched;
